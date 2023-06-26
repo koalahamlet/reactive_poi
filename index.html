@@ -21,7 +21,7 @@
 
 
 const synth = new Tone.Synth().toMaster()
-synth.triggerAttackRelease('C4', '8n')
+
 window.synth = synth
 
 // document.getElementById("play-button").addEventListener("click", function() {
@@ -67,30 +67,63 @@ function listInputsAndOutputs(midiAccess) {
 navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure);
 
 const noteMap = {
-        1: "C4",
-        2: "D4",
-        3: "E4",
-        4: "F4",
-        5: "G4",
-        6: "A4",
-        7: "B4",
-        8: "C5",
-        9: "D5",
-        10: "E5",
-        11: "F5",
-        12: "G5",
-        13: "A5",
-        14: "B5",
-        15: "C6",
-        16: "D6",
-        17: "E6",
-        18: "F6",
-        19: "G6",
-        20: "A7",
-        21: "B7",
-        
+  1: "C4",
+  2: "D4",
+  3: "E4",
+  4: "F4",
+  5: "G4",
+  6: "A4",
+  7: "B4",
+  8: "C5",
+  9: "D5",
+  10: "E5",
+  11: "F5",
+  12: "G5",
+  13: "A5",
+  14: "B5",
+  15: "C6",
+  16: "D6",
+  17: "E6",
+  18: "F6",
+  19: "G6",
+  20: "A7",
+  21: "B7",
       };
 
+const claireDeLune = [
+  noteMap[14], noteMap[12], noteMap[10], noteMap[9], noteMap[10], noteMap[12], noteMap[14], // Bar 1
+  noteMap[15], noteMap[14], noteMap[12], noteMap[10], noteMap[9], noteMap[10], noteMap[12], // Bar 2
+  noteMap[14], noteMap[15], noteMap[17], noteMap[15], noteMap[14], noteMap[12], noteMap[14], // Bar 3
+  noteMap[15], noteMap[14], noteMap[12], noteMap[10], noteMap[9], noteMap[10], noteMap[12], // Bar 4
+  noteMap[14], noteMap[15], noteMap[17], noteMap[15], noteMap[14], noteMap[12], noteMap[14], // Bar 5
+  noteMap[12], noteMap[14], noteMap[15], noteMap[17], noteMap[19], noteMap[21], noteMap[19], // Bar 6
+  noteMap[17], noteMap[15], noteMap[14], noteMap[12], noteMap[14], noteMap[15], noteMap[17], // Bar 7
+  noteMap[19], noteMap[17], noteMap[15], noteMap[14], noteMap[12], noteMap[10], noteMap[9], // Bar 8
+  noteMap[14], noteMap[12], noteMap[10], noteMap[9], noteMap[10], noteMap[12], noteMap[14], // Bar 1
+  noteMap[15], noteMap[14], noteMap[12], noteMap[10], noteMap[9], noteMap[10], noteMap[12], // Bar 2
+  noteMap[14], noteMap[15], noteMap[17], noteMap[15], noteMap[14], noteMap[12], noteMap[14], // Bar 3
+  noteMap[15], noteMap[14], noteMap[12], noteMap[10], noteMap[9], noteMap[10], noteMap[12], // Bar 4
+  noteMap[14], noteMap[15], noteMap[17], noteMap[15], noteMap[14], noteMap[12], noteMap[14], // Bar 5
+  noteMap[12], noteMap[14], noteMap[15], noteMap[17], noteMap[19], noteMap[21], noteMap[19], // Bar 6
+  noteMap[17], noteMap[15], noteMap[14], noteMap[12], noteMap[14], noteMap[15], noteMap[17], // Bar 7
+  noteMap[19], noteMap[17], noteMap[15], noteMap[14], noteMap[12], noteMap[10], noteMap[9], // Bar 8
+  noteMap[14], noteMap[12], noteMap[10], noteMap[9], noteMap[10], noteMap[12], noteMap[14], // Bar 1
+  noteMap[15], noteMap[14], noteMap[12], noteMap[10], noteMap[9], noteMap[10], noteMap[12], // Bar 2
+  noteMap[14], noteMap[15], noteMap[17], noteMap[15], noteMap[14], noteMap[12], noteMap[14], // Bar 3
+  noteMap[15], noteMap[14], noteMap[12], noteMap[10], noteMap[9], noteMap[10], noteMap[12], // Bar 4
+  noteMap[14], noteMap[15], noteMap[17], noteMap[15], noteMap[14], noteMap[12], noteMap[14], // Bar 5
+  noteMap[12], noteMap[14], noteMap[15], noteMap[17], noteMap[19], noteMap[21], noteMap[19], // Bar 6
+  noteMap[17], noteMap[15], noteMap[14], noteMap[12], noteMap[14], noteMap[15], noteMap[17], // Bar 7
+  noteMap[19], noteMap[17], noteMap[15], noteMap[14], noteMap[12], noteMap[10], noteMap[9], // Bar 8
+  noteMap[14], noteMap[12], noteMap[10], noteMap[9], noteMap[10], noteMap[12], noteMap[14], // Bar 1
+  noteMap[15], noteMap[14], noteMap[12], noteMap[10], noteMap[9], noteMap[10], noteMap[12], // Bar 2
+  noteMap[14], noteMap[15], noteMap[17], noteMap[15], noteMap[14], noteMap[12], noteMap[14], // Bar 3
+  noteMap[15], noteMap[14], noteMap[12], noteMap[10], noteMap[9], noteMap[10], noteMap[12], // Bar 4
+  noteMap[14], noteMap[15], noteMap[17], noteMap[15], noteMap[14], noteMap[12], noteMap[14], // Bar 5
+  noteMap[12], noteMap[14], noteMap[15], noteMap[17], noteMap[19], noteMap[21], noteMap[19], // Bar 6
+  noteMap[17], noteMap[15], noteMap[14], noteMap[12], noteMap[14], noteMap[15], noteMap[17], // Bar 7
+  noteMap[19], noteMap[17], noteMap[15], noteMap[14], noteMap[12], noteMap[10], noteMap[9], // Bar 8
+];
 
 const noteMapCanon = {
         1: "D4",
@@ -133,30 +166,27 @@ const noteMapCanon = {
         
       };
 
+var isNotPlaying = true
 
 blah.onclick = () => {
+    synth.triggerAttackRelease('C4', '8n')
     navigator.bluetooth.requestDevice({ filters: [{ services: ["19B10010-E8F2-537E-4F6C-D104768A1214".toLowerCase()] }] }).then(async device =>{
     service = await device.gatt.connect() //getPrimaryService("19B10010-E8F2-537E-4F6C-D104768A1214".toLowerCase())
     service = await device.gatt.getPrimaryService("19B10010-E8F2-537E-4F6C-D104768A1214".toLowerCase())
     characteristics = await service.getCharacteristics()
     Tone.Transport.start();
     // Tone.Transport.stop();
+    var index = 0
     characteristics[2].oncharacteristicvaluechanged = (e) => {
-
         var myVal = new Uint8Array(e.target.value.buffer)[0]
-        console.log(myVal)
-        if(myVal>8) {
-            // Tone.Transport.start();
-            // const synth = new Tone.PolySynth(myVal, Tone.Synth, { // changed from 3 to 5
-            //     oscillator : {
-            //             type : "sawtooth"
-            //     }
-            // }).toMaster();
-            // window.synth = synth
-
-            const note = noteMap[myVal];
+        console.log(myVal, isNotPlaying)
+        if(myVal>14 && isNotPlaying) {
+            const note = claireDeLune[index];
             synth.triggerAttackRelease(note, '16n')
-            
+            console.log("played " +note +"at index "+index)
+            index++
+            isNotPlaying = false
+            setTimeout(() => isNotPlaying = true, 200)
         } else {
             // Tone.Transport.stop();
         }
